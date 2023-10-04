@@ -1,0 +1,97 @@
+class Product:
+    def __init__(self, name, price, available):
+        self.name = name
+        self.price = price
+        self.available = available
+def percentage_discount(price, quantity):
+    return price * quantity * 0.9 
+
+def buy_one_get_one_free(price, quantity):
+    return (quantity // 2 + quantity % 2) * price
+class Cart:
+    def __init__(self):
+        self.items = []
+
+    def add_product(self, product, quantity):
+        self.items.append({'product': product, 'quantity': quantity})
+
+    def update_quantity(self, product_name, quantity):
+        for item in self.items:
+            if item['product'].name.lower() == product_name.lower():
+                item['quantity'] = quantity
+
+    def remove_product(self, product_name):
+        self.items = [item for item in self.items if item['product'].name.lower() != product_name.lower()]
+
+    def calculate_total_bill(self, discount_strategy):
+        total_price = 0
+        for item in self.items:
+            total_price += discount_strategy(item['product'].price, item['quantity'])
+        return total_price
+
+def main():
+    cart = Cart()
+
+    while True:
+        print("\nOptions:")
+        print("1. Add to cart")
+        print("2. Update quantity")
+        print("3. Remove from cart")
+        print("4. View Cart")
+        print("5. Checkbill")
+        print("6. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            product_name = input("Enter product name: ")
+            price = float(input(f"Enter price of {product_name}: "))
+            available = input("Is the product available? (true or false): ").lower() == 'true'
+            quantity = int(input(f"Enter quantity of {product_name}: "))
+            product = Product(product_name, price, available)
+            cart.add_product(product, quantity)
+            print(f"{quantity} {product_name}(s) added to your cart.")
+
+        elif choice == "2":
+            product_name = input("Enter product name to update quantity: ")
+            quantity = int(input(f"Enter new quantity of {product_name}: "))
+            cart.update_quantity(product_name, quantity)
+            print(f"Quantity of {product_name} updated to {quantity}.")
+
+        elif choice == "3":
+            product_name = input("Enter product name to remove from cart: ")
+            cart.remove_product(product_name)
+            print(f"{product_name} removed from your cart.")
+
+        elif choice == "4":
+            print("Cart Items:")
+            for item in cart.items:
+                print(f"You have {item['quantity']} {item['product'].name}(s)")
+
+        elif choice == "5":
+            while True:
+                print("Select discount strategy:")
+                print("1. 10% off")
+                print("2. Buy one get one free")
+                discount_choice = input("Enter your choice: ")
+                if discount_choice in ["1", "2"]:
+                    break
+                else:
+                    print("Invalid choice. Please enter 1 or 2.")
+                    
+            if discount_choice == "1":
+                total_bill = cart.calculate_total_bill(percentage_discount)
+            elif discount_choice == "2":
+                total_bill = cart.calculate_total_bill(buy_one_get_one_free)
+                
+            print("Total Bill:")
+            print(f"Your total bill is ${total_bill:.2f}.")
+            break
+
+        elif choice == "6":
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
